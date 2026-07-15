@@ -1,0 +1,57 @@
+|                               |
+|-------------------------------|
+| Title: Gantt Charts           |
+| Author: James Vizzard         |
+| Project: Tools for Future Use |
+| Date: 20260714                |
+| Output: Graphics              |
+
+```{r, echo = FALSE}
+# Using ggplot2
+# Libraries
+library(dplyr)
+library(forcats)
+library(ggplot2)
+library(here)
+library(tidyr)
+library(tidyverse)
+
+# Set home folder
+here::i_am("gantt.Rmd")
+# here() starts at /Users/james-macbook/Data/samples
+
+# Data
+project_timeline <- read_csv("gantt.csv")
+
+# Convert dates
+project_timeline2 <- project_timeline %>%
+  mutate(start_date = as.Date(start_date), end_date = as.Date(end_date)) %>%
+  pivot_longer("start_date":"end_date", names_to = "date_type", values_to = "date") 
+
+# Plot
+ggplot() +
+  geom_line(data=project_timeline2, mapping=aes(x=fct_rev(fct_inorder(task)), y=date, color=status), linewidth = 10) +
+  coord_flip() + 
+  scale_y_date(date_breaks = "30 day") +
+  labs(title="Gantt Chart",
+       x = "Task",
+       y = "Date") + 
+  theme_bw() + 
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+```{r, echo = FALSE}
+# Using Vistime package
+# Libraries
+library(vistime)
+
+# Set home folder
+here::i_am("gantt.Rmd")
+# here() starts at /Users/james-macbook/Data/samples
+
+# Data
+project_timeline <- read_csv("gantt_vistime.csv")
+
+# Plot
+vistime(project_timeline, optimize_y = FALSE, linewidth = 40)
+```
